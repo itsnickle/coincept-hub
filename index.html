@@ -4,105 +4,97 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no">
 <meta name="theme-color" content="#0a0e2a">
-<title>CoinCept · Saving Planet</title>
+<title>Coinaverse · CoinCept</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --space1:#0a0e2a; --space2:#1a1248; --space3:#2a1c5e;
-    --gold:#FFD54F; --gold-d:#E8A60C; --green:#1f9e4d; --green-d:#137a38;
-    --pink:#ff5db1; --purple:#a855f7; --ink:#0c1330; --cream:#fff7e6;
-  }
+  :root{--space1:#0a0e2a;--space2:#1a1248;--space3:#2a1c5e;--gold:#FFD54F;--gold-d:#E8A60C;--ink:#0c1330;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;}
-  body{
-    font-family:'Fredoka',system-ui,sans-serif;
-    background:var(--space1);
-    color:#fff; overflow:hidden;
-    user-select:none; -webkit-user-select:none;
-  }
-  #app{
-    position:relative; width:100%; height:100dvh;
-    max-width:480px; margin:0 auto; display:flex; flex-direction:column;
-    background:radial-gradient(120% 80% at 50% 8%, var(--space3) 0%, var(--space2) 42%, var(--space1) 100%);
-    overflow:hidden;
-  }
-  /* ---- starfield ---- */
-  .stars{position:absolute;inset:0;pointer-events:none;}
+  body{font-family:'Fredoka',system-ui,sans-serif;background:var(--space1);color:#fff;overflow:hidden;user-select:none;-webkit-user-select:none;}
+  #app{position:relative;width:100%;height:100dvh;max-width:480px;margin:0 auto;display:flex;flex-direction:column;
+    background:radial-gradient(120% 80% at 50% 8%,var(--space3),var(--space2) 42%,var(--space1));overflow:hidden;}
+  .stars{position:absolute;inset:0;pointer-events:none;z-index:0;}
   .stars i{position:absolute;background:#fff;border-radius:50%;opacity:.8;animation:tw 3s ease-in-out infinite;}
   @keyframes tw{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+  .float{animation:fl 4s ease-in-out infinite;}@keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 
-  /* ================= HUD ================= */
-  .hud{position:relative;z-index:20;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;}
-  .hud-row{display:flex;align-items:center;gap:8px;}
-  .chip{display:flex;align-items:center;gap:6px;background:rgba(12,19,48,.66);border:1.5px solid rgba(255,255,255,.14);
-    backdrop-filter:blur(6px);border-radius:999px;padding:5px 11px 5px 5px;font-weight:600;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.3);}
-  .lvl{margin-right:auto;}
-  .lvl .ring{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#3a2a00;
-    background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));box-shadow:0 0 0 2px #fff5,inset 0 -2px 4px #0003;}
-  .coin-ico{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));
-    display:grid;place-items:center;color:#7a5300;font-weight:700;font-size:13px;box-shadow:inset 0 -2px 3px #0003;}
-  .streak .fl{font-size:16px;filter:drop-shadow(0 0 5px #ff8a3d);}
-  /* savings meter */
-  .vault-hud{margin-top:8px;background:rgba(12,19,48,.62);border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:9px 12px;
-    backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.3);}
-  .vault-hud .lab{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:600;color:#cfe7ff;margin-bottom:5px;letter-spacing:.02em;}
-  .vault-hud .lab b{color:#fff;}
+  /* HUD */
+  .hud{position:relative;z-index:20;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;display:none;}
+  .hud.on{display:block;}
+  .hud-row{display:flex;align-items:center;gap:7px;}
+  .chip{display:flex;align-items:center;gap:5px;background:rgba(12,19,48,.66);border:1.5px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(6px);border-radius:999px;padding:5px 11px 5px 5px;font-weight:600;font-size:13.5px;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+  .chip.me{margin-right:auto;padding-right:11px;}
+  .chip.me img{width:30px;height:30px;border-radius:50%;background:#ffffff18;object-fit:cover;object-position:top;}
+  .coin-ico{width:21px;height:21px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));display:grid;place-items:center;color:#7a5300;font-weight:700;font-size:12px;}
+  .cred{color:#c084fc;}.cred b{color:#e9d5ff;}
+
+  /* SCREENS */
+  .stage{position:relative;flex:1;min-height:0;}
+  .screen{position:absolute;inset:0;z-index:5;display:none;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .screen.on{display:flex;}
+  .pad{padding:0 16px 30px;}
+  .ttl{padding:calc(env(safe-area-inset-top) + 16px) 16px 2px;}
+  .ttl h1{font-size:25px;font-weight:700;line-height:1.1;}
+  .ttl .sub{color:#aab6e0;font-size:14px;font-weight:500;margin-top:3px;}
+
+  /* archetype pick */
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:13px;padding:16px;}
+  .acard{position:relative;border-radius:18px;overflow:hidden;cursor:pointer;border:2.5px solid transparent;transition:transform .12s,border-color .15s;background:#15103a;}
+  .acard:active{transform:scale(.96);}
+  .acard.sel{border-color:var(--gold);box-shadow:0 0 0 3px #ffd54f44,0 8px 22px #0007;}
+  .acard img{width:100%;display:block;aspect-ratio:46/60;object-fit:cover;}
+  .acard .meta{padding:8px 10px 10px;}
+  .acard .nm{font-weight:700;font-size:15px;line-height:1.1;}
+  .acard .tg{font-size:11.5px;font-weight:600;margin-top:1px;}
+  .acard .sel-tick{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;background:var(--gold);color:#5a3d00;display:none;place-items:center;font-weight:700;box-shadow:0 2px 8px #0006;}
+  .acard.sel .sel-tick{display:grid;}
+  .cta-bar{position:sticky;bottom:0;padding:12px 16px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(0deg,var(--space1) 55%,transparent);}
+  .btn{display:block;width:100%;border:none;border-radius:16px;padding:15px;font-family:inherit;font-size:16.5px;font-weight:700;cursor:pointer;
+    background:linear-gradient(180deg,#ffd768,var(--gold-d));color:#4a3200;box-shadow:0 6px 0 #b9810a,0 10px 18px #0006;transition:.1s;}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b9810a,0 5px 12px #0006;}
+  .btn:disabled{filter:grayscale(.6) brightness(.8);box-shadow:0 6px 0 #555;cursor:default;}
+  .btn.green{background:linear-gradient(180deg,#43d27e,#137a38);color:#063d1d;box-shadow:0 6px 0 #0c5a2b,0 10px 18px #0006;}
+  .btn.ghost{background:#ffffff14;color:#cdd6f5;box-shadow:none;border:1.5px solid #ffffff22;margin-top:9px;}
+
+  /* galaxy map */
+  .map{position:relative;flex:1;min-height:560px;}
+  .planet{position:absolute;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;transition:transform .14s;}
+  .planet:active{transform:scale(.93);}
+  .planet .orb-w{width:84px;height:84px;border-radius:50%;background-size:cover;background-position:center;border:3px solid #ffffff33;
+    box-shadow:0 0 22px var(--c,#fff)55, inset 0 -8px 16px #0007, 0 8px 18px #0006;position:relative;}
+  .planet.home .orb-w{border-color:var(--gold);box-shadow:0 0 26px #ffd54f99,inset 0 -8px 16px #0007;}
+  .planet .nm{font-size:11.5px;font-weight:600;background:#0c1330cc;padding:2px 8px;border-radius:99px;border:1px solid #ffffff1f;white-space:nowrap;max-width:120px;text-align:center;}
+  .planet .home-b{position:absolute;top:-7px;right:-7px;background:var(--gold);color:#5a3d00;font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px;box-shadow:0 0 0 2px #0c1330;}
+  .planet .lock-b{position:absolute;inset:0;border-radius:50%;background:#04061cbb;display:grid;place-items:center;font-size:24px;}
+
+  /* world hub */
+  .world{position:absolute;inset:0;background-size:cover;background-position:center;z-index:1;}
+  .world::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#0a0e2a55 0%,#0a0e2a22 30%,#0a0e2acc 72%,#0a0e2a 100%);}
+  .wtop{position:relative;z-index:6;padding:calc(env(safe-area-inset-top) + 8px) 14px 0;}
+  .back{display:inline-flex;align-items:center;gap:6px;background:rgba(12,19,48,.6);border:1.5px solid #ffffff22;border-radius:99px;padding:7px 13px 7px 10px;font-weight:600;font-size:13.5px;cursor:pointer;color:#fff;backdrop-filter:blur(6px);}
+  .wname{position:relative;z-index:6;margin:auto 0 0;padding:0 16px;}
+  .wname .k{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+  .wname h1{font-size:29px;font-weight:700;line-height:1;margin:2px 0 4px;text-shadow:0 3px 14px #000a;}
+  .wname p{color:#dfe7ff;font-size:13.5px;max-width:300px;text-shadow:0 2px 8px #000a;}
+  .wmeter{position:relative;z-index:6;margin:14px 16px 0;background:rgba(12,19,48,.66);border:1.5px solid #ffffff1f;border-radius:16px;padding:9px 12px;backdrop-filter:blur(6px);}
+  .wmeter .lab{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;color:#cfe7ff;margin-bottom:5px;}
   .bar{height:13px;border-radius:99px;background:#0b1030;overflow:hidden;box-shadow:inset 0 1px 3px #000a;}
-  .bar > i{display:block;height:100%;width:0;border-radius:99px;
-    background:linear-gradient(90deg,var(--green),#43d27e 70%,var(--gold));transition:width .7s cubic-bezier(.2,.9,.25,1);box-shadow:0 0 10px #43d27e88;}
+  .bar>i{display:block;height:100%;width:0;border-radius:99px;transition:width .7s cubic-bezier(.2,.9,.25,1);}
+  .nodes{position:relative;z-index:6;display:flex;justify-content:center;gap:12px;padding:16px 12px calc(env(safe-area-inset-bottom) + 16px);flex-wrap:wrap;margin-top:auto;}
+  .node{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:transform .12s;width:72px;}
+  .node:active{transform:scale(.92);}
+  .node .ic{width:60px;height:60px;border-radius:18px;display:grid;place-items:center;font-size:27px;position:relative;
+    background:linear-gradient(160deg,#3a2c78,#241a52);border:2px solid #ffffff26;box-shadow:0 8px 16px #0006,inset 0 2px 6px #ffffff14;}
+  .node.prime .ic{background:linear-gradient(160deg,#ffe07a,var(--gold-d));border-color:#fff7;color:#5a3d00;box-shadow:0 8px 20px #e8a60c66;}
+  .node .t{font-size:11px;font-weight:600;background:#0c1330cc;padding:2px 7px;border-radius:99px;border:1px solid #ffffff1f;white-space:nowrap;}
+  .node .bdg{position:absolute;top:-6px;right:-6px;min-width:19px;height:19px;padding:0 4px;border-radius:99px;background:#ff5db1;font-size:11px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #0c1330;}
+  .wave{position:absolute;z-index:6;bottom:118px;left:50%;transform:translateX(-50%);width:34%;max-width:150px;filter:drop-shadow(0 10px 14px #0009);pointer-events:none;}
+  .wave img{width:100%;}
 
-  /* ================= SCENE ================= */
-  .scene{position:relative;flex:1;overflow:hidden;}
-  .panel{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .25s;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-  .panel.on{opacity:1;visibility:visible;}
-
-  /* planet horizon */
-  .planet{position:absolute;left:50%;bottom:-58%;transform:translateX(-50%);width:170%;aspect-ratio:1;border-radius:50%;
-    background:radial-gradient(circle at 50% 26%, #2bb15e 0%, #1f9e4d 30%, #14773a 60%, #0c5a2b 100%);
-    box-shadow:0 -10px 60px #1f9e4d66, inset 0 14px 40px #6cf0a355;}
-  .planet::before{content:"";position:absolute;inset:0;border-radius:50%;
-    background:radial-gradient(60px 24px at 30% 18%, #ffffff22, transparent),radial-gradient(80px 30px at 70% 12%, #ffffff18, transparent);}
-  .ground-glow{position:absolute;left:0;right:0;bottom:0;height:38%;background:radial-gradient(80% 100% at 50% 100%, #1f9e4d44, transparent 70%);pointer-events:none;}
-
-  .float{animation:fl 4s ease-in-out infinite;}
-  @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-
-  /* Pluto hero */
-  .hero{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);width:46%;max-width:210px;z-index:6;
-    filter:drop-shadow(0 12px 18px #0008);}
-  .hero img{width:100%;display:block;}
-  .hero .shadow{position:absolute;left:50%;bottom:-3%;transform:translateX(-50%);width:60%;height:18px;border-radius:50%;background:#0006;filter:blur(5px);}
-  .speech{position:absolute;left:50%;top:-34px;transform:translateX(-50%);background:#fff;color:#21306a;font-size:12px;font-weight:600;
-    padding:6px 12px;border-radius:13px;max-width:200px;text-align:center;line-height:1.25;box-shadow:0 5px 14px #0005;animation:fl 4s ease-in-out infinite;}
-  .speech::after{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-7px;border:7px solid transparent;border-top-color:#fff;}
-
-  /* tappable building nodes */
-  .node{position:absolute;z-index:5;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
-    transition:transform .12s;}
-  .node:active{transform:scale(.93);}
-  .node .icon{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;font-size:30px;position:relative;
-    background:linear-gradient(160deg,#3a2c78,#241a52);border:2px solid #ffffff22;box-shadow:0 8px 18px #0006, inset 0 2px 6px #ffffff14;}
-  .node .icon.gold{background:linear-gradient(160deg,#ffe07a,var(--gold-d));border-color:#fff6;color:#5a3d00;box-shadow:0 8px 22px #e8a60c66,inset 0 2px 6px #fff8;}
-  .node .icon.green{background:linear-gradient(160deg,#36c873,var(--green-d));border-color:#fff6;}
-  .node .lbl{font-size:11.5px;font-weight:600;background:#0c1330cc;padding:2px 8px;border-radius:99px;border:1px solid #ffffff1f;white-space:nowrap;}
-  .badge{position:absolute;top:-7px;right:-7px;min-width:21px;height:21px;padding:0 5px;border-radius:99px;background:var(--pink);
-    font-size:12px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #0c1330;animation:pop 1.4s ease-in-out infinite;}
-  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
-
-  /* threat — MoneySpinner lab */
-  .threat{position:absolute;top:9%;left:50%;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;align-items:center;cursor:pointer;}
-  .threat .orb{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;
-    background:radial-gradient(circle at 50% 35%,#ff8fd0,#c026a3 60%,#6b1278);box-shadow:0 0 26px #ff5db1aa,inset 0 -6px 14px #0006;
-    animation:fl 3.4s ease-in-out infinite;border:2px solid #ffffff33;overflow:hidden;}
-  .threat .orb img{width:128%;margin-top:14%;filter:drop-shadow(0 4px 6px #0006);}
-  .threat .ring{position:absolute;inset:-7px;border-radius:50%;border:2px dashed #ff9ad6aa;animation:spin 9s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .threat .warn{margin-top:6px;font-size:11px;font-weight:700;color:#ffd1ec;background:#7a124e99;padding:3px 9px;border-radius:99px;border:1px solid #ff5db155;
-    animation:pop 1.3s ease-in-out infinite;}
-
-  /* ===== generic sheet/modal ===== */
+  /* sheet/modal */
   .scrim{position:fixed;inset:0;background:#04061ccc;backdrop-filter:blur(3px);z-index:40;opacity:0;visibility:hidden;transition:.2s;}
   .scrim.on{opacity:1;visibility:visible;}
   .sheet{position:absolute;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:linear-gradient(180deg,#241a52,#15103a);
@@ -110,55 +102,14 @@
     transform:translateY(102%);transition:transform .32s cubic-bezier(.2,.9,.25,1);box-shadow:0 -16px 40px #000a;}
   .scrim.on .sheet{transform:translateY(0);}
   .grab{width:42px;height:5px;border-radius:99px;background:#ffffff33;margin:0 auto 14px;}
-  .sheet h2{font-size:21px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .sheet h2{font-size:21px;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:8px;}
   .sheet p{color:#c7d2f0;font-size:14.5px;line-height:1.5;margin-bottom:14px;}
   .sheet p b{color:#ffe7a3;}
-  .btn{display:block;width:100%;border:none;border-radius:16px;padding:15px;font-family:inherit;font-size:16.5px;font-weight:700;cursor:pointer;
-    background:linear-gradient(180deg,#ffd768,var(--gold-d));color:#4a3200;box-shadow:0 6px 0 #b9810a,0 10px 18px #0006;transition:.1s;}
-  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b9810a,0 5px 12px #0006;}
-  .btn.green{background:linear-gradient(180deg,#43d27e,var(--green-d));color:#063d1d;box-shadow:0 6px 0 #0c5a2b,0 10px 18px #0006;}
-  .btn.ghost{background:#ffffff14;color:#cdd6f5;box-shadow:none;border:1.5px solid #ffffff22;margin-top:9px;}
-
-  /* lists (worlds / heroes) */
-  .head{padding:calc(env(safe-area-inset-top) + 8px) 16px 4px;}
-  .head h1{font-size:23px;font-weight:700;}
-  .head .sub{color:#aab6e0;font-size:13.5px;font-weight:500;}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px 28px;}
-  .card{background:linear-gradient(165deg,#2a2060,#1a1444);border:1.5px solid #ffffff1c;border-radius:20px;padding:12px;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;}
-  .card.lock{opacity:.62;}
-  .card .thumb{flex:1;display:grid;place-items:center;border-radius:14px;margin-bottom:8px;min-height:88px;position:relative;}
-  .card .thumb img{max-height:120px;max-width:96%;filter:drop-shadow(0 6px 8px #0006);}
-  .card .nm{font-weight:700;font-size:15px;}
-  .card .ro{font-size:11.5px;color:#ffd98a;font-weight:600;}
-  .card .lk{position:absolute;top:9px;right:10px;font-size:15px;opacity:.85;}
-  .tag{position:absolute;top:9px;left:10px;font-size:10px;font-weight:700;background:var(--green);padding:2px 7px;border-radius:99px;}
-  .tag.soon{background:#5b4bb0;}
-
-  /* world rows */
-  .wrow{display:flex;align-items:center;gap:13px;background:linear-gradient(120deg,#2a2060,#1a1444);border:1.5px solid #ffffff18;border-radius:18px;padding:12px;margin:0 16px 11px;}
-  .wrow .pl{width:52px;height:52px;border-radius:50%;flex:none;box-shadow:inset 0 -4px 10px #0005, 0 0 14px #0004;}
-  .wrow .nm{font-weight:700;font-size:16px;}
-  .wrow .ds{font-size:12.5px;color:#aab6e0;}
-  .wrow .go{margin-left:auto;font-size:12px;font-weight:700;padding:7px 13px;border-radius:99px;}
-  .go.play{background:var(--gold);color:#5a3d00;}
-  .go.lk{background:#ffffff14;color:#9fb;border:1px solid #ffffff22;color:#aeb8e0;}
-
-  /* ================= BOTTOM NAV ================= */
-  .nav{position:relative;z-index:25;display:flex;justify-content:space-around;align-items:center;
-    padding:7px 6px calc(env(safe-area-inset-bottom) + 7px);background:rgba(10,12,34,.86);backdrop-filter:blur(10px);border-top:1.5px solid #ffffff14;}
-  .nav button{background:none;border:none;color:#7e89bd;font-family:inherit;font-size:10.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 8px;border-radius:12px;transition:.15s;}
-  .nav button .ic{font-size:21px;line-height:1;}
-  .nav button.on{color:#fff;}
-  .nav button.on .ic{filter:drop-shadow(0 0 8px var(--gold));transform:translateY(-1px);}
-
-  /* fx */
-  .flyc{position:fixed;z-index:60;width:26px;height:26px;border-radius:50%;pointer-events:none;
-    background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));display:grid;place-items:center;color:#7a5300;font-weight:700;font-size:14px;box-shadow:0 2px 6px #0006;}
-  .confetti{position:fixed;z-index:70;width:10px;height:14px;top:-20px;pointer-events:none;border-radius:2px;}
-  .toast{position:fixed;left:50%;top:18%;transform:translateX(-50%) scale(.8);z-index:80;background:#fff;color:#1f9e4d;font-weight:700;
-    font-size:18px;padding:12px 22px;border-radius:16px;box-shadow:0 12px 30px #000a;opacity:0;transition:.3s;text-align:center;}
+  .toast{position:fixed;left:50%;top:16%;transform:translateX(-50%) scale(.8);z-index:80;background:#fff;color:#137a38;font-weight:700;font-size:18px;padding:12px 22px;border-radius:16px;box-shadow:0 12px 30px #000a;opacity:0;transition:.3s;text-align:center;max-width:84%;}
   .toast.on{opacity:1;transform:translateX(-50%) scale(1);}
   .toast small{display:block;color:#7a5300;font-size:12px;font-weight:600;margin-top:2px;}
+  .flyc{position:fixed;z-index:60;width:24px;height:24px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));display:grid;place-items:center;color:#7a5300;font-weight:700;font-size:13px;box-shadow:0 2px 6px #0006;}
+  .confetti{position:fixed;z-index:70;width:10px;height:14px;top:-20px;pointer-events:none;border-radius:2px;}
 </style>
 </head>
 <body>
@@ -166,273 +117,199 @@
   <div class="stars" id="stars"></div>
 
   <!-- HUD -->
-  <div class="hud">
+  <div class="hud" id="hud">
     <div class="hud-row">
-      <div class="chip lvl"><div class="ring" id="lvlBadge">3</div><span>Pluto</span></div>
-      <div class="chip"><span class="coin-ico">$</span><b id="credits">240</b></div>
-      <div class="chip streak"><span class="fl">🔥</span><b id="streak">5</b></div>
-    </div>
-    <div class="vault-hud">
-      <div class="lab"><span>🔐 Savings Vault</span><span><b id="savNum">85</b> / <span id="savGoal">100</span> Credits</span></div>
-      <div class="bar"><i id="savBar"></i></div>
+      <div class="chip me" id="meChip"><img id="meAv" alt=""><span id="meName">Hero</span></div>
+      <div class="chip"><span class="coin-ico">$</span><b id="coins">100</b></div>
+      <div class="chip"><span>⚡</span>L<b id="lvl">1</b></div>
+      <div class="chip cred"><span>💎</span><b id="cred">350</b></div>
     </div>
   </div>
 
-  <!-- SCENE -->
-  <div class="scene">
-    <!-- PLANET HUB -->
-    <div class="panel on" id="panel-planet">
-      <div class="planet"></div>
-      <div class="ground-glow"></div>
-
-      <!-- threat -->
-      <div class="threat" onclick="openThreat()">
-        <div class="orb"><div class="ring"></div><img src="assets/moneyspinner.png" alt="Madam MoneySpinner"></div>
-        <div class="warn">⚠ Savings under attack!</div>
-      </div>
-
-      <!-- nodes -->
-      <div class="node float" style="left:7%;top:34%" onclick="openClassroom()">
-        <div class="icon">🪐<div class="badge">!</div></div><div class="lbl">Mr JQ's Class</div>
-      </div>
-      <div class="node float" style="right:7%;top:30%;animation-delay:.6s" onclick="openQuest()">
-        <div class="icon">📋<div class="badge">1</div></div><div class="lbl">Daily Quest</div>
-      </div>
-      <div class="node" style="left:9%;bottom:30%" onclick="openEarn()">
-        <div class="icon green">💼</div><div class="lbl">Earn Credits</div>
-      </div>
-      <div class="node" style="right:8%;bottom:31%" onclick="openSave()">
-        <div class="icon gold">🏦</div><div class="lbl">Savings Vault</div>
-      </div>
-
-      <!-- hero -->
-      <div class="hero">
-        <div class="speech" id="speech">Let's protect our savings!</div>
-        <img src="assets/pluto.png" alt="Pluto">
-        <div class="shadow"></div>
-      </div>
-    </div>
-
-    <!-- WORLDS -->
-    <div class="panel" id="panel-worlds">
-      <div class="head"><h1>Worlds</h1><div class="sub">The Financial Literacy Solar System</div></div>
-      <div style="height:8px"></div>
-      <div class="wrow">
-        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#2bb15e,#0c5a2b)"></div>
-        <div><div class="nm">Saving Planet</div><div class="ds">Pluto · Saving money</div></div>
-        <span class="go play" onclick="nav('planet')">Playing</span>
-      </div>
-      <div class="wrow">
-        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#5db4ff,#1f4f9e)"></div>
-        <div><div class="nm">Allocation Axis</div><div class="ds">Zuna · Budgeting</div></div>
-        <span class="go lk">🔒 Soon</span>
-      </div>
-      <div class="wrow">
-        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#ffb04d,#9e5b1f)"></div>
-        <div><div class="nm">Investment Galaxy</div><div class="ds">Bahati · Investing</div></div>
-        <span class="go lk">🔒 Soon</span>
-      </div>
-      <div class="wrow">
-        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#c77dff,#6b1278)"></div>
-        <div><div class="nm">Credit Cosmo</div><div class="ds">Coming soon</div></div>
-        <span class="go lk">🔒 Soon</span>
-      </div>
-      <div class="wrow">
-        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#ff6b8a,#9e1f3f)"></div>
-        <div><div class="nm">Drain Dominion</div><div class="ds">Villain territory</div></div>
-        <span class="go lk">🔒 Soon</span>
-      </div>
-    </div>
-
-    <!-- HEROES -->
-    <div class="panel" id="panel-heroes">
-      <div class="head"><h1>CoinCept Heroes</h1><div class="sub">Your money superhero squad</div></div>
-      <div class="grid">
-        <div class="card"><span class="tag">Unlocked</span><div class="thumb"><img src="assets/pluto.png"></div><div class="nm">Pluto</div><div class="ro">Saving</div></div>
-        <div class="card lock"><span class="tag soon">Soon</span><div class="thumb"><img src="assets/zuna.png"></div><div class="nm">Zuna</div><div class="ro">Budgeting</div></div>
-        <div class="card lock"><span class="tag soon">Soon</span><div class="thumb"><img src="assets/bahati.png"></div><div class="nm">Bahati</div><div class="ro">Investing</div></div>
-        <div class="card lock"><span class="tag soon">Soon</span><div class="thumb"><img src="assets/mrjq.png"></div><div class="nm">Mr JQ</div><div class="ro">The Teacher</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Neema</div><div class="ro">Coming soon</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Dhani</div><div class="ro">Coming soon</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Ghani</div><div class="ro">Coming soon</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Dario</div><div class="ro">Coming soon</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Jesse</div><div class="ro">Coming soon</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Edo</div><div class="ro">Coming soon</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Otto</div><div class="ro">Coming soon</div></div>
-        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Powa</div><div class="ro">Coming soon</div></div>
-      </div>
-    </div>
-
-    <!-- SHOP -->
-    <div class="panel" id="panel-shop">
-      <div class="head"><h1>Hero Shop</h1><div class="sub">Earn it by saving — never pay to win</div></div>
-      <div class="grid">
-        <div class="card"><div class="thumb" style="font-size:46px">🦸🏾‍♂️</div><div class="nm">Gold Cape</div><div class="ro">300 Credits</div></div>
-        <div class="card"><div class="thumb" style="font-size:46px">⌚</div><div class="nm">Money Watch</div><div class="ro">150 Credits</div></div>
-        <div class="card"><div class="thumb" style="font-size:46px">🏠</div><div class="nm">Kente Banner</div><div class="ro">220 Credits</div></div>
-        <div class="card"><div class="thumb" style="font-size:46px">🛡️</div><div class="nm">Piggy Shield</div><div class="ro">400 Credits</div></div>
-      </div>
-    </div>
-
-    <!-- ME -->
-    <div class="panel" id="panel-me">
-      <div class="head"><h1>My Progress</h1><div class="sub">Parent dashboard preview</div></div>
-      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
-        <div class="wrow" style="margin:0"><div style="font-size:30px">💰</div><div><div class="nm">Total Saved</div><div class="ds">Lifetime Credits moved to the Vault</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px" id="meTotal">485</b></div>
-        <div class="wrow" style="margin:0"><div style="font-size:30px">🔥</div><div><div class="nm">Money Magnet Streak</div><div class="ds">Days saved in a row</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px" id="meStreak">5</b></div>
-        <div class="wrow" style="margin:0"><div style="font-size:30px">🎓</div><div><div class="nm">Lessons Learned</div><div class="ds">Concepts mastered with Mr JQ</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px">3</b></div>
-        <div class="wrow" style="margin:0"><div style="font-size:30px">⭐</div><div><div class="nm">Hero Level</div><div class="ds">Pluto · Saving Planet</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px">3</b></div>
-      </div>
-    </div>
+  <div class="stage">
+  <!-- SCREEN: archetype pick -->
+  <div class="screen on" id="s-archetype">
+    <div class="ttl"><h1>Pick your money hero</h1><div class="sub">Every hero has a money superpower. Which one are you?</div></div>
+    <div class="cards" id="archCards"></div>
+    <div class="cta-bar"><button class="btn" id="enterBtn" disabled onclick="enterCoinaverse()">Pick a hero to continue</button></div>
   </div>
 
-  <!-- NAV -->
-  <div class="nav" id="nav">
-    <button class="on" data-p="planet" onclick="nav('planet')"><span class="ic">🪐</span>Planet</button>
-    <button data-p="worlds" onclick="nav('worlds')"><span class="ic">🌌</span>Worlds</button>
-    <button data-p="heroes" onclick="nav('heroes')"><span class="ic">🦸🏾</span>Heroes</button>
-    <button data-p="shop" onclick="nav('shop')"><span class="ic">🛍️</span>Shop</button>
-    <button data-p="me" onclick="nav('me')"><span class="ic">📊</span>Me</button>
+  <!-- SCREEN: galaxy map -->
+  <div class="screen" id="s-map">
+    <div class="ttl"><h1>The Coinaverse</h1><div class="sub" id="mapSub">Tap a world to explore its money missions</div></div>
+    <div class="map" id="map"></div>
   </div>
+
+  <!-- SCREEN: world hub -->
+  <div class="screen" id="s-world">
+    <div class="world" id="worldBg"></div>
+    <div class="wtop"><span class="back" onclick="go('map')">‹ Map</span></div>
+    <div class="wname"><div class="k" id="wKind">HOME WORLD</div><h1 id="wTitle">World</h1><p id="wDesc"></p></div>
+    <div class="wmeter"><div class="lab"><span id="wMeterName">Progress</span><span><b id="wCur">0</b> / <span id="wGoal">100</span></span></div><div class="bar"><i id="wBar"></i></div></div>
+    <div class="wave" id="wAvatar"><img id="wAvImg" alt=""></div>
+    <div class="nodes" id="wNodes"></div>
+  </div>
+  </div>
+
+  <div class="scrim" id="scrim" onclick="if(event.target.id==='scrim')closeSheet()"><div class="sheet" id="sheet"></div></div>
+  <div class="toast" id="toast"></div>
 </div>
-
-<!-- SHEET -->
-<div class="scrim" id="scrim" onclick="if(event.target.id==='scrim')closeSheet()">
-  <div class="sheet" id="sheet"></div>
-</div>
-<div class="toast" id="toast"></div>
 
 <script>
-  // ---------- state ----------
-  var S = { credits:240, sav:85, goal:100, streak:5, lifetime:485, level:3 };
+// ───────── DATA (from Coinaverse spec) ─────────
+const ARCH = {
+  strategist:{name:'The Strategist',tag:'Master Planner',blurb:'Budgeting, efficiency & smart decisions.',world:'budgetron',color:'#3B82F6'},
+  builder:{name:'The Builder',tag:'Empire Creator',blurb:'Creative entrepreneur — builds businesses & opportunities.',world:'launchlab',color:'#F97316'},
+  investor:{name:'The Investor',tag:'Long Game Player',blurb:'Long-term thinker — grows wealth and assets.',world:'investopia',color:'#10B981'},
+  guardian:{name:'The Guardian',tag:'Wealth Protector',blurb:'Saving, stability & financial security.',world:'savescape',color:'#06B6D4'},
+  risktaker:{name:'The Risk Taker',tag:'High Stakes Player',blurb:'High-risk / high-reward, bold plays.',world:'bitstream',color:'#EF4444'},
+  rebuilder:{name:'The Rebuilder',tag:'Phoenix Spirit',blurb:'Resilient — overcomes setbacks & rebuilds.',world:'debtdetox',color:'#A855F7'},
+};
+const ARCH_ORDER = ['strategist','builder','investor','guardian','risktaker','rebuilder'];
+const WORLDS = {
+  budgetron:{name:'Budgetron Base',kind:'Strategy command center',img:'world_budgetron.jpg',color:'#3B82F6',
+    meter:'Budget Power',verb:'Allocate',icon:'📊',concept:'budgeting',
+    lessonQ:'You just earned money. What do you do FIRST?',lessonOk:'Make a plan for it',lessonNo:'Spend it all'},
+  launchlab:{name:'Launch Lab Realm',kind:'Entrepreneur city',img:'world_launchlab.jpg',color:'#F97316',
+    meter:'Business Value',verb:'Build',icon:'🚀',concept:'entrepreneurship',
+    lessonQ:'Your lemonade stand made $10 profit. Smartest move?',lessonOk:'Reinvest to grow it',lessonNo:'Buy candy with all of it'},
+  investopia:{name:'Investopia',kind:'Wealth-growing world',img:'world_investopia.jpg',color:'#10B981',
+    meter:'Portfolio',verb:'Invest',icon:'📈',concept:'investing',
+    lessonQ:'Investing grows your money best over…',lessonOk:'A long time',lessonNo:'One day'},
+  savescape:{name:'Savescape Orbit',kind:'Protective fortress orbit',img:'world_savescape.jpg',color:'#06B6D4',
+    meter:'Savings Vault',verb:'Save',icon:'🔐',concept:'saving',
+    lessonQ:'Where does money stay safe for the future?',lessonOk:'In a savings vault',lessonNo:'Under the bed'},
+  bitstream:{name:'Bitstream Valley',kind:'High-volatility valley',img:'world_bitstream.jpg',color:'#EF4444',
+    meter:'Bold Gains',verb:'Take a Bet',icon:'⚡',concept:'risk vs reward',
+    lessonQ:'Really high reward usually means…',lessonOk:'Really high risk',lessonNo:'No risk at all'},
+  debtdetox:{name:'Debt Detox District',kind:'Recovery & rebuild zone',img:'world_debtdetox.jpg',color:'#A855F7',
+    meter:'Debt Cleared',verb:'Repay',icon:'🛠️',concept:'beating debt',
+    lessonQ:'Best way to beat a debt?',lessonOk:'Pay a bit, consistently',lessonNo:'Ignore it'},
+  credtech:{name:'CredTech Galaxy',kind:'Universal credit cosmos',img:'world_credtech.jpg',color:'#FFB300',
+    meter:'Cred Score',verb:'Build Credit',icon:'💳',concept:'credit',
+    lessonQ:'What builds a good credit score?',lessonOk:'Paying on time',lessonNo:'Skipping payments'},
+};
+const WORLD_ORDER = ['budgetron','launchlab','investopia','savescape','bitstream','debtdetox','credtech'];
+const MAP_POS = {budgetron:[12,6],launchlab:[58,12],investopia:[20,33],savescape:[62,40],bitstream:[14,60],debtdetox:[58,66],credtech:[34,86]};
 
-  // starfield
-  (function(){var s=document.getElementById('stars'),h='';for(var i=0;i<46;i++){var sz=Math.random()*2+1;h+='<i style="left:'+Math.random()*100+'%;top:'+Math.random()*70+'%;width:'+sz+'px;height:'+sz+'px;animation-delay:'+(Math.random()*3)+'s"></i>';}s.innerHTML=h;})();
+let S = {arch:null, coins:100, xp:0, lvl:1, cred:350, streak:0, world:null, prog:{}, goal:{}};
+WORLD_ORDER.forEach(w=>{S.prog[w]=0;S.goal[w]=100;});
 
-  function render(){
-    document.getElementById('credits').textContent=S.credits;
-    document.getElementById('savNum').textContent=S.sav;
-    document.getElementById('savGoal').textContent=S.goal;
-    document.getElementById('streak').textContent=S.streak;
-    document.getElementById('savBar').style.width=Math.min(100,(S.sav/S.goal)*100)+'%';
-    document.getElementById('meTotal').textContent=S.lifetime;
-    document.getElementById('meStreak').textContent=S.streak;
-    document.getElementById('lvlBadge').textContent=S.level;
-  }
-  render();
+// starfield
+(function(){var s=document.getElementById('stars'),h='';for(var i=0;i<46;i++){var z=Math.random()*2+1;h+='<i style="left:'+Math.random()*100+'%;top:'+Math.random()*92+'%;width:'+z+'px;height:'+z+'px;animation-delay:'+(Math.random()*3)+'s"></i>';}s.innerHTML=h;})();
 
-  // ---------- nav ----------
-  function nav(p){
-    document.querySelectorAll('.panel').forEach(function(el){el.classList.toggle('on',el.id==='panel-'+p);});
-    document.querySelectorAll('#nav button').forEach(function(b){b.classList.toggle('on',b.dataset.p===p);});
-  }
+// ───────── archetype pick ─────────
+(function(){
+  var h='';ARCH_ORDER.forEach(function(id){var a=ARCH[id];
+    h+='<div class="acard" data-a="'+id+'" onclick="selArch(\''+id+'\')">'+
+       '<div class="sel-tick">✓</div>'+
+       '<img src="assets/card_'+id+'.jpg" alt="'+a.name+'">'+
+       '<div class="meta"><div class="nm">'+a.name+'</div><div class="tg" style="color:'+a.color+'">'+a.tag+'</div></div></div>';
+  });document.getElementById('archCards').innerHTML=h;
+})();
+function selArch(id){
+  S.arch=id;
+  document.querySelectorAll('.acard').forEach(function(c){c.classList.toggle('sel',c.dataset.a===id);});
+  var b=document.getElementById('enterBtn');b.disabled=false;b.textContent='Enter the Coinaverse as '+ARCH[id].name+' →';
+}
+function enterCoinaverse(){
+  if(!S.arch)return;
+  var a=ARCH[S.arch];
+  document.getElementById('meAv').src='assets/av_'+S.arch+'.png';
+  document.getElementById('meName').textContent=a.name.replace('The ','');
+  document.getElementById('hud').classList.add('on');
+  S.prog[a.world]=35; // home world started
+  buildMap();
+  document.getElementById('mapSub').textContent='You\'re a '+a.name+' — your home world is '+WORLDS[a.world].name+'. Tap any world to play.';
+  go('map');
+}
 
-  // ---------- sheet ----------
-  function openSheet(html){document.getElementById('sheet').innerHTML='<div class="grab"></div>'+html;document.getElementById('scrim').classList.add('on');}
-  function closeSheet(){document.getElementById('scrim').classList.remove('on');}
+// ───────── galaxy map ─────────
+function buildMap(){
+  var home=ARCH[S.arch].world,h='';
+  WORLD_ORDER.forEach(function(w){var W=WORLDS[w],p=MAP_POS[w];
+    var isHome=w===home;
+    h+='<div class="planet'+(isHome?' home':'')+'" style="left:'+p[0]+'%;top:'+p[1]+'%;--c:'+W.color+'" onclick="openWorld(\''+w+'\')">'+
+       '<div class="orb-w" style="background-image:url(assets/'+W.img+')">'+(isHome?'<div class="home-b">HOME</div>':'')+'</div>'+
+       '<div class="nm">'+W.name+'</div></div>';
+  });
+  document.getElementById('map').innerHTML=h;
+}
 
-  function say(t){var s=document.getElementById('speech');s.textContent=t;}
+// ───────── world hub ─────────
+function openWorld(w){
+  S.world=w;var W=WORLDS[w];
+  document.getElementById('worldBg').style.backgroundImage='url(assets/'+W.img+')';
+  document.getElementById('wKind').textContent=(w===ARCH[S.arch].world?'★ YOUR HOME WORLD':W.kind.toUpperCase());
+  document.getElementById('wTitle').textContent=W.name;
+  document.getElementById('wDesc').textContent='Master '+W.concept+' with '+W.verb.toLowerCase()+' missions.';
+  document.getElementById('wMeterName').textContent=W.meter;
+  document.getElementById('wAvImg').src='assets/av_'+S.arch+'.png';
+  var bar=document.getElementById('wBar');bar.style.background='linear-gradient(90deg,'+W.color+',#fff6 120%)';bar.style.boxShadow='0 0 10px '+W.color+'88';
+  // nodes
+  document.getElementById('wNodes').innerHTML=
+    '<div class="node prime" onclick="openAct()"><div class="ic">'+W.icon+'</div><div class="t">'+W.verb+'</div></div>'+
+    '<div class="node" onclick="openEarn()"><div class="ic">💼</div><div class="t">Earn</div></div>'+
+    '<div class="node" onclick="openLesson()"><div class="ic">🪐</div><div class="ic-x"></div><div class="t">Mr JQ</div></div>'+
+    '<div class="node" onclick="openQuest()"><div class="ic">📋<div class="bdg">1</div></div><div class="t">Quest</div></div>';
+  renderWorld();go('world');
+}
+function renderWorld(){
+  var w=S.world,W=WORLDS[w];
+  document.getElementById('wCur').textContent=S.prog[w];
+  document.getElementById('wGoal').textContent=S.goal[w];
+  document.getElementById('wBar').style.width=Math.min(100,(S.prog[w]/S.goal[w])*100)+'%';
+}
+function renderHUD(){document.getElementById('coins').textContent=S.coins;document.getElementById('lvl').textContent=S.lvl;document.getElementById('cred').textContent=S.cred;}
 
-  // ---------- core: SAVE loop ----------
-  function openSave(){
-    var canSave=Math.min(15,S.credits);
-    openSheet(
-      '<h2>🏦 Savings Vault</h2>'+
-      '<p>Money doesn\'t save itself — <b>you</b> choose to move it. Slide your spending Credits into the Vault, where small amounts grow BIG over time.</p>'+
-      '<p>You have <b>'+S.credits+' Credits</b> in your Spending Wallet. Move <b>'+canSave+'</b> into your Savings Vault?</p>'+
-      '<button class="btn green" onclick="doSave('+canSave+')">Save '+canSave+' Credits 🔐</button>'+
-      '<button class="btn ghost" onclick="closeSheet()">Maybe later</button>'
-    );
-  }
-  function doSave(amt){
-    if(amt<=0){closeSheet();return;}
-    closeSheet();
-    flyCoins(()=>{
-      S.credits-=amt; S.sav+=amt; S.lifetime+=amt;
-      if(S.sav>=S.goal){
-        var over=S.sav-S.goal; S.sav=S.goal;
-        render(); confetti(); toast('GOAL REACHED! 🎉','Savings Vault full · +1 Level');
-        say('Saving today protects your tomorrow!');
-        setTimeout(function(){S.level++;S.goal+=50;S.sav=over;S.streak++;render();},1700);
-      } else {
-        render(); toast('Nice save! 🔐','+'+amt+' Credits in the Vault');
-        say('Even small amounts grow big over time!');
-      }
-    });
-  }
+// ───────── loop ─────────
+function openSheet(html){document.getElementById('sheet').innerHTML='<div class="grab"></div>'+html;document.getElementById('scrim').classList.add('on');}
+function closeSheet(){document.getElementById('scrim').classList.remove('on');}
 
-  // ---------- earn ----------
-  function openEarn(){
-    openSheet(
-      '<h2>💼 Earn Credits</h2>'+
-      '<p>Heroes earn before they save. Do a job to add Credits to your <b>Spending Wallet</b> — then decide how much to save.</p>'+
-      '<button class="btn" onclick="doEarn(15)">🍃 Rake the leaves · +15</button>'+
-      '<button class="btn ghost" onclick="closeSheet()">Close</button>'
-    );
-  }
-  function doEarn(a){closeSheet();S.credits+=a;render();toast('+'+a+' Credits 💪','Now move some to savings!');say('Now let\'s move some to the Vault!');}
+function openAct(){
+  var W=WORLDS[S.world],amt=Math.min(15,S.coins);
+  openSheet('<h2>'+W.icon+' '+W.verb+'</h2>'+
+    '<p>Put <b>'+amt+' Credits</b> to work in <b>'+W.name+'</b> to raise your <b>'+W.meter+'</b>. '+actCopy(S.world)+'</p>'+
+    '<button class="btn green" onclick="doAct('+amt+')">'+W.verb+' '+amt+' Credits</button>'+
+    '<button class="btn ghost" onclick="closeSheet()">Maybe later</button>');
+}
+function actCopy(w){return {
+  budgetron:'A good plan tells every Credit where to go.',
+  launchlab:'Reinvest profits and your business grows itself.',
+  investopia:'Small amounts invested early grow huge over time.',
+  savescape:'Money you save is money ready for surprises.',
+  bitstream:'Bold plays can pay off big — manage the risk.',
+  debtdetox:'Chip away consistently and debt disappears.',
+  credtech:'Paying on time, every time, builds trust.'}[w]||'';}
+function doAct(amt){
+  if(amt<=0){closeSheet();toast('Earn some Credits first 💼');return;}
+  closeSheet();var w=S.world,W=WORLDS[w];
+  flyCoins(function(){
+    S.coins-=amt;S.prog[w]+=amt;S.xp+=amt;S.cred=Math.min(850,S.cred+3);
+    if(S.prog[w]>=S.goal[w]){var over=S.prog[w]-S.goal[w];S.prog[w]=S.goal[w];renderWorld();renderHUD();confetti();
+      toast(W.name+' mastered! 🎉','+1 Level · '+W.meter+' maxed');
+      setTimeout(function(){S.lvl++;S.goal[w]+=60;S.prog[w]=over;S.streak++;S.coins+=25;renderWorld();renderHUD();toast('Level '+S.lvl+'! 🔥','+25 bonus Credits · streak '+S.streak);},1700);
+    } else {renderWorld();renderHUD();toast('+'+amt+' '+W.meter,W.verb+'ed like a true '+ARCH[S.arch].name+'!');}
+  });
+}
+function openEarn(){openSheet('<h2>💼 Earn Credits</h2><p>Heroes earn before they spend. Do a job to add Credits to your wallet.</p>'+
+  '<button class="btn" onclick="doEarn(15)">🍃 Do a chore · +15</button><button class="btn ghost" onclick="closeSheet()">Close</button>');}
+function doEarn(a){closeSheet();S.coins+=a;renderHUD();toast('+'+a+' Credits 💪','Now put them to work!');}
+function openQuest(){var W=WORLDS[S.world];openSheet('<h2>📋 Daily Mission</h2><p><b>'+W.verb+' 30 Credits in '+W.name+'</b> today to keep your 🔥 streak ('+S.streak+' days). Reward: <b>+30 Credits</b>.</p>'+
+  '<button class="btn" onclick="closeSheet();openAct()">Start mission →</button><button class="btn ghost" onclick="closeSheet()">Later</button>');}
+function openLesson(){var W=WORLDS[S.world];openSheet('<h2>🪐 Mr JQ\'s Lesson</h2><p>Mr JQ teaches from his classroom on another planet:</p><p><b>'+W.lessonQ+'</b></p>'+
+  '<button class="btn green" onclick="quiz(true)">'+W.lessonOk+'</button><button class="btn ghost" onclick="quiz(false)">'+W.lessonNo+'</button>');}
+function quiz(ok){closeSheet();if(ok){S.coins+=10;S.cred=Math.min(850,S.cred+5);renderHUD();toast('Correct! 🎓','+10 Credits · +5 Cred Score');}else{toast('Not quite 🤔','Try the lesson again');setTimeout(openLesson,900);}}
 
-  // ---------- quest ----------
-  function openQuest(){
-    openSheet(
-      '<h2>📋 Daily Money Mission</h2>'+
-      '<p><b>Save 20 Credits today</b> to keep your 🔥 Money Magnet streak alive. You\'re on <b>'+S.streak+' days</b> — don\'t break the chain!</p>'+
-      '<p>Reward: <b>+30 bonus Credits</b> &amp; a new cape colour.</p>'+
-      '<button class="btn" onclick="nav(\'planet\');closeSheet();openSave()">Go save now 🔐</button>'+
-      '<button class="btn ghost" onclick="closeSheet()">Later</button>'
-    );
-  }
-
-  // ---------- classroom (wait-or-learn) ----------
-  function openClassroom(){
-    openSheet(
-      '<h2>🪐 Mr JQ\'s Classroom</h2>'+
-      '<p>Mr JQ teaches from his classroom on another planet. Answer to earn Credits the smart way:</p>'+
-      '<p><b>Where should money go to stay safe for the future?</b></p>'+
-      '<button class="btn green" onclick="quiz(true)">🔐 The Savings Vault</button>'+
-      '<button class="btn ghost" onclick="quiz(false)">🛍️ Spend it all today</button>'
-    );
-  }
-  function quiz(ok){
-    closeSheet();
-    if(ok){S.credits+=10;render();toast('Correct! 🎓','+10 Credits · "Pay yourself first"');say('Save a little now, stay strong later!');}
-    else {toast('Not quite 🤔','Spending it all leaves nothing for surprises');setTimeout(openClassroom,900);}
-  }
-
-  // ---------- threat ----------
-  function openThreat(){
-    openSheet(
-      '<h2>⚠️ Madam MoneySpinner</h2>'+
-      '<p>"Why save when you can SPEND it all today?" She\'s draining savings across the galaxy! <b>Push her back by saving Credits</b> — every save refills the meters she empties.</p>'+
-      '<button class="btn green" onclick="closeSheet();openSave()">Defend — Save now! 🛡️</button>'+
-      '<button class="btn ghost" onclick="closeSheet()">Retreat</button>'
-    );
-  }
-
-  // ---------- fx ----------
-  function flyCoins(done){
-    var wallet=document.getElementById('credits').getBoundingClientRect();
-    var vault=document.getElementById('savNum').getBoundingClientRect();
-    var n=6,fin=0;
-    for(var i=0;i<n;i++){(function(i){
-      var c=document.createElement('div');c.className='flyc';c.textContent='$';
-      c.style.left=wallet.left+'px';c.style.top=wallet.top+'px';document.body.appendChild(c);
-      var dx=vault.left-wallet.left, dy=vault.top-wallet.top;
-      c.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+(dx*.5+(Math.random()*40-20))+'px,'+(dy*.5-40)+'px) scale(1.2)',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale(.4)',opacity:0}],{duration:650,delay:i*70,easing:'cubic-bezier(.4,0,.5,1)'}).onfinish=function(){c.remove();if(++fin===n&&done)done();};
-    })(i);}
-    if(n===0&&done)done();
-  }
-  function confetti(){
-    var cols=['#FFD54F','#1f9e4d','#ff5db1','#5db4ff','#fff'];
-    for(var i=0;i<40;i++){(function(){
-      var d=document.createElement('div');d.className='confetti';
-      d.style.left=Math.random()*100+'%';d.style.background=cols[i%5];d.style.transform='rotate('+Math.random()*360+'deg)';
-      document.body.appendChild(d);
-      d.animate([{top:'-20px',opacity:1},{top:'100vh',opacity:.9}],{duration:1400+Math.random()*900,easing:'cubic-bezier(.3,.6,.5,1)'}).onfinish=function(){d.remove();};
-    })();}
-  }
-  var tT;
-  function toast(msg,sub){var t=document.getElementById('toast');t.innerHTML=msg+(sub?'<small>'+sub+'</small>':'');t.classList.add('on');clearTimeout(tT);tT=setTimeout(function(){t.classList.remove('on');},1800);}
+// ───────── nav + fx ─────────
+function go(s){document.querySelectorAll('.screen').forEach(function(el){el.classList.toggle('on',el.id==='s-'+s);});document.querySelector('#s-'+s).scrollTop=0;}
+function flyCoins(done){var a=document.getElementById('coins').getBoundingClientRect(),b=document.getElementById('wBar').getBoundingClientRect(),n=6,f=0;
+  for(var i=0;i<n;i++){(function(i){var c=document.createElement('div');c.className='flyc';c.textContent='$';c.style.left=a.left+'px';c.style.top=a.top+'px';document.body.appendChild(c);
+    var dx=b.left-a.left,dy=b.top-a.top;c.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+(dx*.5)+'px,'+(dy*.5-30)+'px) scale(1.2)',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale(.4)',opacity:0}],{duration:620,delay:i*70,easing:'cubic-bezier(.4,0,.5,1)'}).onfinish=function(){c.remove();if(++f===n&&done)done();};})(i);}
+  if(n===0&&done)done();}
+function confetti(){var cols=['#FFD54F','#43d27e','#ff5db1','#5db4ff','#fff'];for(var i=0;i<42;i++){(function(){var d=document.createElement('div');d.className='confetti';d.style.left=Math.random()*100+'%';d.style.background=cols[i%5];d.style.transform='rotate('+Math.random()*360+'deg)';document.body.appendChild(d);d.animate([{top:'-20px',opacity:1},{top:'100vh',opacity:.9}],{duration:1500+Math.random()*900,easing:'cubic-bezier(.3,.6,.5,1)'}).onfinish=function(){d.remove();};})();}}
+var tT;function toast(m,s){var t=document.getElementById('toast');t.innerHTML=m+(s?'<small>'+s+'</small>':'');t.classList.add('on');clearTimeout(tT);tT=setTimeout(function(){t.classList.remove('on');},1900);}
+renderHUD();
 </script>
 </body>
 </html>
