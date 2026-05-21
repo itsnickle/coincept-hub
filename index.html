@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0a0e2a">
+<title>CoinCept · Saving Planet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --space1:#0a0e2a; --space2:#1a1248; --space3:#2a1c5e;
+    --gold:#FFD54F; --gold-d:#E8A60C; --green:#1f9e4d; --green-d:#137a38;
+    --pink:#ff5db1; --purple:#a855f7; --ink:#0c1330; --cream:#fff7e6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:'Fredoka',system-ui,sans-serif;
+    background:var(--space1);
+    color:#fff; overflow:hidden;
+    user-select:none; -webkit-user-select:none;
+  }
+  #app{
+    position:relative; width:100%; height:100dvh;
+    max-width:480px; margin:0 auto; display:flex; flex-direction:column;
+    background:radial-gradient(120% 80% at 50% 8%, var(--space3) 0%, var(--space2) 42%, var(--space1) 100%);
+    overflow:hidden;
+  }
+  /* ---- starfield ---- */
+  .stars{position:absolute;inset:0;pointer-events:none;}
+  .stars i{position:absolute;background:#fff;border-radius:50%;opacity:.8;animation:tw 3s ease-in-out infinite;}
+  @keyframes tw{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+
+  /* ================= HUD ================= */
+  .hud{position:relative;z-index:20;padding:calc(env(safe-area-inset-top) + 10px) 12px 8px;}
+  .hud-row{display:flex;align-items:center;gap:8px;}
+  .chip{display:flex;align-items:center;gap:6px;background:rgba(12,19,48,.66);border:1.5px solid rgba(255,255,255,.14);
+    backdrop-filter:blur(6px);border-radius:999px;padding:5px 11px 5px 5px;font-weight:600;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.3);}
+  .lvl{margin-right:auto;}
+  .lvl .ring{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;color:#3a2a00;
+    background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));box-shadow:0 0 0 2px #fff5,inset 0 -2px 4px #0003;}
+  .coin-ico{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));
+    display:grid;place-items:center;color:#7a5300;font-weight:700;font-size:13px;box-shadow:inset 0 -2px 3px #0003;}
+  .streak .fl{font-size:16px;filter:drop-shadow(0 0 5px #ff8a3d);}
+  /* savings meter */
+  .vault-hud{margin-top:8px;background:rgba(12,19,48,.62);border:1.5px solid rgba(255,255,255,.14);border-radius:16px;padding:9px 12px;
+    backdrop-filter:blur(6px);box-shadow:0 4px 14px rgba(0,0,0,.3);}
+  .vault-hud .lab{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:600;color:#cfe7ff;margin-bottom:5px;letter-spacing:.02em;}
+  .vault-hud .lab b{color:#fff;}
+  .bar{height:13px;border-radius:99px;background:#0b1030;overflow:hidden;box-shadow:inset 0 1px 3px #000a;}
+  .bar > i{display:block;height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--green),#43d27e 70%,var(--gold));transition:width .7s cubic-bezier(.2,.9,.25,1);box-shadow:0 0 10px #43d27e88;}
+
+  /* ================= SCENE ================= */
+  .scene{position:relative;flex:1;overflow:hidden;}
+  .panel{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .25s;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .panel.on{opacity:1;visibility:visible;}
+
+  /* planet horizon */
+  .planet{position:absolute;left:50%;bottom:-58%;transform:translateX(-50%);width:170%;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 50% 26%, #2bb15e 0%, #1f9e4d 30%, #14773a 60%, #0c5a2b 100%);
+    box-shadow:0 -10px 60px #1f9e4d66, inset 0 14px 40px #6cf0a355;}
+  .planet::before{content:"";position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(60px 24px at 30% 18%, #ffffff22, transparent),radial-gradient(80px 30px at 70% 12%, #ffffff18, transparent);}
+  .ground-glow{position:absolute;left:0;right:0;bottom:0;height:38%;background:radial-gradient(80% 100% at 50% 100%, #1f9e4d44, transparent 70%);pointer-events:none;}
+
+  .float{animation:fl 4s ease-in-out infinite;}
+  @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+
+  /* Pluto hero */
+  .hero{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);width:46%;max-width:210px;z-index:6;
+    filter:drop-shadow(0 12px 18px #0008);}
+  .hero img{width:100%;display:block;}
+  .hero .shadow{position:absolute;left:50%;bottom:-3%;transform:translateX(-50%);width:60%;height:18px;border-radius:50%;background:#0006;filter:blur(5px);}
+  .speech{position:absolute;left:50%;top:-34px;transform:translateX(-50%);background:#fff;color:#21306a;font-size:12px;font-weight:600;
+    padding:6px 12px;border-radius:13px;max-width:200px;text-align:center;line-height:1.25;box-shadow:0 5px 14px #0005;animation:fl 4s ease-in-out infinite;}
+  .speech::after{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-7px;border:7px solid transparent;border-top-color:#fff;}
+
+  /* tappable building nodes */
+  .node{position:absolute;z-index:5;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;
+    transition:transform .12s;}
+  .node:active{transform:scale(.93);}
+  .node .icon{width:62px;height:62px;border-radius:20px;display:grid;place-items:center;font-size:30px;position:relative;
+    background:linear-gradient(160deg,#3a2c78,#241a52);border:2px solid #ffffff22;box-shadow:0 8px 18px #0006, inset 0 2px 6px #ffffff14;}
+  .node .icon.gold{background:linear-gradient(160deg,#ffe07a,var(--gold-d));border-color:#fff6;color:#5a3d00;box-shadow:0 8px 22px #e8a60c66,inset 0 2px 6px #fff8;}
+  .node .icon.green{background:linear-gradient(160deg,#36c873,var(--green-d));border-color:#fff6;}
+  .node .lbl{font-size:11.5px;font-weight:600;background:#0c1330cc;padding:2px 8px;border-radius:99px;border:1px solid #ffffff1f;white-space:nowrap;}
+  .badge{position:absolute;top:-7px;right:-7px;min-width:21px;height:21px;padding:0 5px;border-radius:99px;background:var(--pink);
+    font-size:12px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #0c1330;animation:pop 1.4s ease-in-out infinite;}
+  @keyframes pop{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+
+  /* threat — MoneySpinner lab */
+  .threat{position:absolute;top:9%;left:50%;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;align-items:center;cursor:pointer;}
+  .threat .orb{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle at 50% 35%,#ff8fd0,#c026a3 60%,#6b1278);box-shadow:0 0 26px #ff5db1aa,inset 0 -6px 14px #0006;
+    animation:fl 3.4s ease-in-out infinite;border:2px solid #ffffff33;overflow:hidden;}
+  .threat .orb img{width:128%;margin-top:14%;filter:drop-shadow(0 4px 6px #0006);}
+  .threat .ring{position:absolute;inset:-7px;border-radius:50%;border:2px dashed #ff9ad6aa;animation:spin 9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .threat .warn{margin-top:6px;font-size:11px;font-weight:700;color:#ffd1ec;background:#7a124e99;padding:3px 9px;border-radius:99px;border:1px solid #ff5db155;
+    animation:pop 1.3s ease-in-out infinite;}
+
+  /* ===== generic sheet/modal ===== */
+  .scrim{position:fixed;inset:0;background:#04061ccc;backdrop-filter:blur(3px);z-index:40;opacity:0;visibility:hidden;transition:.2s;}
+  .scrim.on{opacity:1;visibility:visible;}
+  .sheet{position:absolute;left:0;right:0;bottom:0;max-width:480px;margin:0 auto;background:linear-gradient(180deg,#241a52,#15103a);
+    border-radius:26px 26px 0 0;border-top:2px solid #ffffff22;padding:18px 18px calc(env(safe-area-inset-bottom) + 22px);
+    transform:translateY(102%);transition:transform .32s cubic-bezier(.2,.9,.25,1);box-shadow:0 -16px 40px #000a;}
+  .scrim.on .sheet{transform:translateY(0);}
+  .grab{width:42px;height:5px;border-radius:99px;background:#ffffff33;margin:0 auto 14px;}
+  .sheet h2{font-size:21px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .sheet p{color:#c7d2f0;font-size:14.5px;line-height:1.5;margin-bottom:14px;}
+  .sheet p b{color:#ffe7a3;}
+  .btn{display:block;width:100%;border:none;border-radius:16px;padding:15px;font-family:inherit;font-size:16.5px;font-weight:700;cursor:pointer;
+    background:linear-gradient(180deg,#ffd768,var(--gold-d));color:#4a3200;box-shadow:0 6px 0 #b9810a,0 10px 18px #0006;transition:.1s;}
+  .btn:active{transform:translateY(4px);box-shadow:0 2px 0 #b9810a,0 5px 12px #0006;}
+  .btn.green{background:linear-gradient(180deg,#43d27e,var(--green-d));color:#063d1d;box-shadow:0 6px 0 #0c5a2b,0 10px 18px #0006;}
+  .btn.ghost{background:#ffffff14;color:#cdd6f5;box-shadow:none;border:1.5px solid #ffffff22;margin-top:9px;}
+
+  /* lists (worlds / heroes) */
+  .head{padding:calc(env(safe-area-inset-top) + 8px) 16px 4px;}
+  .head h1{font-size:23px;font-weight:700;}
+  .head .sub{color:#aab6e0;font-size:13.5px;font-weight:500;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 16px 28px;}
+  .card{background:linear-gradient(165deg,#2a2060,#1a1444);border:1.5px solid #ffffff1c;border-radius:20px;padding:12px;position:relative;overflow:hidden;min-height:150px;display:flex;flex-direction:column;}
+  .card.lock{opacity:.62;}
+  .card .thumb{flex:1;display:grid;place-items:center;border-radius:14px;margin-bottom:8px;min-height:88px;position:relative;}
+  .card .thumb img{max-height:120px;max-width:96%;filter:drop-shadow(0 6px 8px #0006);}
+  .card .nm{font-weight:700;font-size:15px;}
+  .card .ro{font-size:11.5px;color:#ffd98a;font-weight:600;}
+  .card .lk{position:absolute;top:9px;right:10px;font-size:15px;opacity:.85;}
+  .tag{position:absolute;top:9px;left:10px;font-size:10px;font-weight:700;background:var(--green);padding:2px 7px;border-radius:99px;}
+  .tag.soon{background:#5b4bb0;}
+
+  /* world rows */
+  .wrow{display:flex;align-items:center;gap:13px;background:linear-gradient(120deg,#2a2060,#1a1444);border:1.5px solid #ffffff18;border-radius:18px;padding:12px;margin:0 16px 11px;}
+  .wrow .pl{width:52px;height:52px;border-radius:50%;flex:none;box-shadow:inset 0 -4px 10px #0005, 0 0 14px #0004;}
+  .wrow .nm{font-weight:700;font-size:16px;}
+  .wrow .ds{font-size:12.5px;color:#aab6e0;}
+  .wrow .go{margin-left:auto;font-size:12px;font-weight:700;padding:7px 13px;border-radius:99px;}
+  .go.play{background:var(--gold);color:#5a3d00;}
+  .go.lk{background:#ffffff14;color:#9fb;border:1px solid #ffffff22;color:#aeb8e0;}
+
+  /* ================= BOTTOM NAV ================= */
+  .nav{position:relative;z-index:25;display:flex;justify-content:space-around;align-items:center;
+    padding:7px 6px calc(env(safe-area-inset-bottom) + 7px);background:rgba(10,12,34,.86);backdrop-filter:blur(10px);border-top:1.5px solid #ffffff14;}
+  .nav button{background:none;border:none;color:#7e89bd;font-family:inherit;font-size:10.5px;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 8px;border-radius:12px;transition:.15s;}
+  .nav button .ic{font-size:21px;line-height:1;}
+  .nav button.on{color:#fff;}
+  .nav button.on .ic{filter:drop-shadow(0 0 8px var(--gold));transform:translateY(-1px);}
+
+  /* fx */
+  .flyc{position:fixed;z-index:60;width:26px;height:26px;border-radius:50%;pointer-events:none;
+    background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));display:grid;place-items:center;color:#7a5300;font-weight:700;font-size:14px;box-shadow:0 2px 6px #0006;}
+  .confetti{position:fixed;z-index:70;width:10px;height:14px;top:-20px;pointer-events:none;border-radius:2px;}
+  .toast{position:fixed;left:50%;top:18%;transform:translateX(-50%) scale(.8);z-index:80;background:#fff;color:#1f9e4d;font-weight:700;
+    font-size:18px;padding:12px 22px;border-radius:16px;box-shadow:0 12px 30px #000a;opacity:0;transition:.3s;text-align:center;}
+  .toast.on{opacity:1;transform:translateX(-50%) scale(1);}
+  .toast small{display:block;color:#7a5300;font-size:12px;font-weight:600;margin-top:2px;}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="stars" id="stars"></div>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="hud-row">
+      <div class="chip lvl"><div class="ring" id="lvlBadge">3</div><span>Pluto</span></div>
+      <div class="chip"><span class="coin-ico">$</span><b id="credits">240</b></div>
+      <div class="chip streak"><span class="fl">🔥</span><b id="streak">5</b></div>
+    </div>
+    <div class="vault-hud">
+      <div class="lab"><span>🔐 Savings Vault</span><span><b id="savNum">85</b> / <span id="savGoal">100</span> Credits</span></div>
+      <div class="bar"><i id="savBar"></i></div>
+    </div>
+  </div>
+
+  <!-- SCENE -->
+  <div class="scene">
+    <!-- PLANET HUB -->
+    <div class="panel on" id="panel-planet">
+      <div class="planet"></div>
+      <div class="ground-glow"></div>
+
+      <!-- threat -->
+      <div class="threat" onclick="openThreat()">
+        <div class="orb"><div class="ring"></div><img src="assets/moneyspinner.png" alt="Madam MoneySpinner"></div>
+        <div class="warn">⚠ Savings under attack!</div>
+      </div>
+
+      <!-- nodes -->
+      <div class="node float" style="left:7%;top:34%" onclick="openClassroom()">
+        <div class="icon">🪐<div class="badge">!</div></div><div class="lbl">Mr JQ's Class</div>
+      </div>
+      <div class="node float" style="right:7%;top:30%;animation-delay:.6s" onclick="openQuest()">
+        <div class="icon">📋<div class="badge">1</div></div><div class="lbl">Daily Quest</div>
+      </div>
+      <div class="node" style="left:9%;bottom:30%" onclick="openEarn()">
+        <div class="icon green">💼</div><div class="lbl">Earn Credits</div>
+      </div>
+      <div class="node" style="right:8%;bottom:31%" onclick="openSave()">
+        <div class="icon gold">🏦</div><div class="lbl">Savings Vault</div>
+      </div>
+
+      <!-- hero -->
+      <div class="hero">
+        <div class="speech" id="speech">Let's protect our savings!</div>
+        <img src="assets/pluto.png" alt="Pluto">
+        <div class="shadow"></div>
+      </div>
+    </div>
+
+    <!-- WORLDS -->
+    <div class="panel" id="panel-worlds">
+      <div class="head"><h1>Worlds</h1><div class="sub">The Financial Literacy Solar System</div></div>
+      <div style="height:8px"></div>
+      <div class="wrow">
+        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#2bb15e,#0c5a2b)"></div>
+        <div><div class="nm">Saving Planet</div><div class="ds">Pluto · Saving money</div></div>
+        <span class="go play" onclick="nav('planet')">Playing</span>
+      </div>
+      <div class="wrow">
+        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#5db4ff,#1f4f9e)"></div>
+        <div><div class="nm">Allocation Axis</div><div class="ds">Zuna · Budgeting</div></div>
+        <span class="go lk">🔒 Soon</span>
+      </div>
+      <div class="wrow">
+        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#ffb04d,#9e5b1f)"></div>
+        <div><div class="nm">Investment Galaxy</div><div class="ds">Bahati · Investing</div></div>
+        <span class="go lk">🔒 Soon</span>
+      </div>
+      <div class="wrow">
+        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#c77dff,#6b1278)"></div>
+        <div><div class="nm">Credit Cosmo</div><div class="ds">Coming soon</div></div>
+        <span class="go lk">🔒 Soon</span>
+      </div>
+      <div class="wrow">
+        <div class="pl" style="background:radial-gradient(circle at 40% 30%,#ff6b8a,#9e1f3f)"></div>
+        <div><div class="nm">Drain Dominion</div><div class="ds">Villain territory</div></div>
+        <span class="go lk">🔒 Soon</span>
+      </div>
+    </div>
+
+    <!-- HEROES -->
+    <div class="panel" id="panel-heroes">
+      <div class="head"><h1>CoinCept Heroes</h1><div class="sub">Your money superhero squad</div></div>
+      <div class="grid">
+        <div class="card"><span class="tag">Unlocked</span><div class="thumb"><img src="assets/pluto.png"></div><div class="nm">Pluto</div><div class="ro">Saving</div></div>
+        <div class="card lock"><span class="tag soon">Soon</span><div class="thumb"><img src="assets/zuna.png"></div><div class="nm">Zuna</div><div class="ro">Budgeting</div></div>
+        <div class="card lock"><span class="tag soon">Soon</span><div class="thumb"><img src="assets/bahati.png"></div><div class="nm">Bahati</div><div class="ro">Investing</div></div>
+        <div class="card lock"><span class="tag soon">Soon</span><div class="thumb"><img src="assets/mrjq.png"></div><div class="nm">Mr JQ</div><div class="ro">The Teacher</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Neema</div><div class="ro">Coming soon</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Dhani</div><div class="ro">Coming soon</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Ghani</div><div class="ro">Coming soon</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Dario</div><div class="ro">Coming soon</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Jesse</div><div class="ro">Coming soon</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Edo</div><div class="ro">Coming soon</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏾</div><div class="nm">Otto</div><div class="ro">Coming soon</div></div>
+        <div class="card lock"><span class="lk">🔒</span><div class="thumb">🦸🏿</div><div class="nm">Powa</div><div class="ro">Coming soon</div></div>
+      </div>
+    </div>
+
+    <!-- SHOP -->
+    <div class="panel" id="panel-shop">
+      <div class="head"><h1>Hero Shop</h1><div class="sub">Earn it by saving — never pay to win</div></div>
+      <div class="grid">
+        <div class="card"><div class="thumb" style="font-size:46px">🦸🏾‍♂️</div><div class="nm">Gold Cape</div><div class="ro">300 Credits</div></div>
+        <div class="card"><div class="thumb" style="font-size:46px">⌚</div><div class="nm">Money Watch</div><div class="ro">150 Credits</div></div>
+        <div class="card"><div class="thumb" style="font-size:46px">🏠</div><div class="nm">Kente Banner</div><div class="ro">220 Credits</div></div>
+        <div class="card"><div class="thumb" style="font-size:46px">🛡️</div><div class="nm">Piggy Shield</div><div class="ro">400 Credits</div></div>
+      </div>
+    </div>
+
+    <!-- ME -->
+    <div class="panel" id="panel-me">
+      <div class="head"><h1>My Progress</h1><div class="sub">Parent dashboard preview</div></div>
+      <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">
+        <div class="wrow" style="margin:0"><div style="font-size:30px">💰</div><div><div class="nm">Total Saved</div><div class="ds">Lifetime Credits moved to the Vault</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px" id="meTotal">485</b></div>
+        <div class="wrow" style="margin:0"><div style="font-size:30px">🔥</div><div><div class="nm">Money Magnet Streak</div><div class="ds">Days saved in a row</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px" id="meStreak">5</b></div>
+        <div class="wrow" style="margin:0"><div style="font-size:30px">🎓</div><div><div class="nm">Lessons Learned</div><div class="ds">Concepts mastered with Mr JQ</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px">3</b></div>
+        <div class="wrow" style="margin:0"><div style="font-size:30px">⭐</div><div><div class="nm">Hero Level</div><div class="ds">Pluto · Saving Planet</div></div><b style="margin-left:auto;color:#ffd98a;font-size:18px">3</b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav" id="nav">
+    <button class="on" data-p="planet" onclick="nav('planet')"><span class="ic">🪐</span>Planet</button>
+    <button data-p="worlds" onclick="nav('worlds')"><span class="ic">🌌</span>Worlds</button>
+    <button data-p="heroes" onclick="nav('heroes')"><span class="ic">🦸🏾</span>Heroes</button>
+    <button data-p="shop" onclick="nav('shop')"><span class="ic">🛍️</span>Shop</button>
+    <button data-p="me" onclick="nav('me')"><span class="ic">📊</span>Me</button>
+  </div>
+</div>
+
+<!-- SHEET -->
+<div class="scrim" id="scrim" onclick="if(event.target.id==='scrim')closeSheet()">
+  <div class="sheet" id="sheet"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  // ---------- state ----------
+  var S = { credits:240, sav:85, goal:100, streak:5, lifetime:485, level:3 };
+
+  // starfield
+  (function(){var s=document.getElementById('stars'),h='';for(var i=0;i<46;i++){var sz=Math.random()*2+1;h+='<i style="left:'+Math.random()*100+'%;top:'+Math.random()*70+'%;width:'+sz+'px;height:'+sz+'px;animation-delay:'+(Math.random()*3)+'s"></i>';}s.innerHTML=h;})();
+
+  function render(){
+    document.getElementById('credits').textContent=S.credits;
+    document.getElementById('savNum').textContent=S.sav;
+    document.getElementById('savGoal').textContent=S.goal;
+    document.getElementById('streak').textContent=S.streak;
+    document.getElementById('savBar').style.width=Math.min(100,(S.sav/S.goal)*100)+'%';
+    document.getElementById('meTotal').textContent=S.lifetime;
+    document.getElementById('meStreak').textContent=S.streak;
+    document.getElementById('lvlBadge').textContent=S.level;
+  }
+  render();
+
+  // ---------- nav ----------
+  function nav(p){
+    document.querySelectorAll('.panel').forEach(function(el){el.classList.toggle('on',el.id==='panel-'+p);});
+    document.querySelectorAll('#nav button').forEach(function(b){b.classList.toggle('on',b.dataset.p===p);});
+  }
+
+  // ---------- sheet ----------
+  function openSheet(html){document.getElementById('sheet').innerHTML='<div class="grab"></div>'+html;document.getElementById('scrim').classList.add('on');}
+  function closeSheet(){document.getElementById('scrim').classList.remove('on');}
+
+  function say(t){var s=document.getElementById('speech');s.textContent=t;}
+
+  // ---------- core: SAVE loop ----------
+  function openSave(){
+    var canSave=Math.min(15,S.credits);
+    openSheet(
+      '<h2>🏦 Savings Vault</h2>'+
+      '<p>Money doesn\'t save itself — <b>you</b> choose to move it. Slide your spending Credits into the Vault, where small amounts grow BIG over time.</p>'+
+      '<p>You have <b>'+S.credits+' Credits</b> in your Spending Wallet. Move <b>'+canSave+'</b> into your Savings Vault?</p>'+
+      '<button class="btn green" onclick="doSave('+canSave+')">Save '+canSave+' Credits 🔐</button>'+
+      '<button class="btn ghost" onclick="closeSheet()">Maybe later</button>'
+    );
+  }
+  function doSave(amt){
+    if(amt<=0){closeSheet();return;}
+    closeSheet();
+    flyCoins(()=>{
+      S.credits-=amt; S.sav+=amt; S.lifetime+=amt;
+      if(S.sav>=S.goal){
+        var over=S.sav-S.goal; S.sav=S.goal;
+        render(); confetti(); toast('GOAL REACHED! 🎉','Savings Vault full · +1 Level');
+        say('Saving today protects your tomorrow!');
+        setTimeout(function(){S.level++;S.goal+=50;S.sav=over;S.streak++;render();},1700);
+      } else {
+        render(); toast('Nice save! 🔐','+'+amt+' Credits in the Vault');
+        say('Even small amounts grow big over time!');
+      }
+    });
+  }
+
+  // ---------- earn ----------
+  function openEarn(){
+    openSheet(
+      '<h2>💼 Earn Credits</h2>'+
+      '<p>Heroes earn before they save. Do a job to add Credits to your <b>Spending Wallet</b> — then decide how much to save.</p>'+
+      '<button class="btn" onclick="doEarn(15)">🍃 Rake the leaves · +15</button>'+
+      '<button class="btn ghost" onclick="closeSheet()">Close</button>'
+    );
+  }
+  function doEarn(a){closeSheet();S.credits+=a;render();toast('+'+a+' Credits 💪','Now move some to savings!');say('Now let\'s move some to the Vault!');}
+
+  // ---------- quest ----------
+  function openQuest(){
+    openSheet(
+      '<h2>📋 Daily Money Mission</h2>'+
+      '<p><b>Save 20 Credits today</b> to keep your 🔥 Money Magnet streak alive. You\'re on <b>'+S.streak+' days</b> — don\'t break the chain!</p>'+
+      '<p>Reward: <b>+30 bonus Credits</b> &amp; a new cape colour.</p>'+
+      '<button class="btn" onclick="nav(\'planet\');closeSheet();openSave()">Go save now 🔐</button>'+
+      '<button class="btn ghost" onclick="closeSheet()">Later</button>'
+    );
+  }
+
+  // ---------- classroom (wait-or-learn) ----------
+  function openClassroom(){
+    openSheet(
+      '<h2>🪐 Mr JQ\'s Classroom</h2>'+
+      '<p>Mr JQ teaches from his classroom on another planet. Answer to earn Credits the smart way:</p>'+
+      '<p><b>Where should money go to stay safe for the future?</b></p>'+
+      '<button class="btn green" onclick="quiz(true)">🔐 The Savings Vault</button>'+
+      '<button class="btn ghost" onclick="quiz(false)">🛍️ Spend it all today</button>'
+    );
+  }
+  function quiz(ok){
+    closeSheet();
+    if(ok){S.credits+=10;render();toast('Correct! 🎓','+10 Credits · "Pay yourself first"');say('Save a little now, stay strong later!');}
+    else {toast('Not quite 🤔','Spending it all leaves nothing for surprises');setTimeout(openClassroom,900);}
+  }
+
+  // ---------- threat ----------
+  function openThreat(){
+    openSheet(
+      '<h2>⚠️ Madam MoneySpinner</h2>'+
+      '<p>"Why save when you can SPEND it all today?" She\'s draining savings across the galaxy! <b>Push her back by saving Credits</b> — every save refills the meters she empties.</p>'+
+      '<button class="btn green" onclick="closeSheet();openSave()">Defend — Save now! 🛡️</button>'+
+      '<button class="btn ghost" onclick="closeSheet()">Retreat</button>'
+    );
+  }
+
+  // ---------- fx ----------
+  function flyCoins(done){
+    var wallet=document.getElementById('credits').getBoundingClientRect();
+    var vault=document.getElementById('savNum').getBoundingClientRect();
+    var n=6,fin=0;
+    for(var i=0;i<n;i++){(function(i){
+      var c=document.createElement('div');c.className='flyc';c.textContent='$';
+      c.style.left=wallet.left+'px';c.style.top=wallet.top+'px';document.body.appendChild(c);
+      var dx=vault.left-wallet.left, dy=vault.top-wallet.top;
+      c.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+(dx*.5+(Math.random()*40-20))+'px,'+(dy*.5-40)+'px) scale(1.2)',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale(.4)',opacity:0}],{duration:650,delay:i*70,easing:'cubic-bezier(.4,0,.5,1)'}).onfinish=function(){c.remove();if(++fin===n&&done)done();};
+    })(i);}
+    if(n===0&&done)done();
+  }
+  function confetti(){
+    var cols=['#FFD54F','#1f9e4d','#ff5db1','#5db4ff','#fff'];
+    for(var i=0;i<40;i++){(function(){
+      var d=document.createElement('div');d.className='confetti';
+      d.style.left=Math.random()*100+'%';d.style.background=cols[i%5];d.style.transform='rotate('+Math.random()*360+'deg)';
+      document.body.appendChild(d);
+      d.animate([{top:'-20px',opacity:1},{top:'100vh',opacity:.9}],{duration:1400+Math.random()*900,easing:'cubic-bezier(.3,.6,.5,1)'}).onfinish=function(){d.remove();};
+    })();}
+  }
+  var tT;
+  function toast(msg,sub){var t=document.getElementById('toast');t.innerHTML=msg+(sub?'<small>'+sub+'</small>':'');t.classList.add('on');clearTimeout(tT);tT=setTimeout(function(){t.classList.remove('on');},1800);}
+</script>
+</body>
+</html>
