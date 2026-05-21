@@ -160,41 +160,39 @@
   .flyc{position:fixed;z-index:60;width:24px;height:24px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--gold) 55%,var(--gold-d));display:grid;place-items:center;color:#7a5300;font-weight:700;font-size:13px;}
   .confetti{position:fixed;z-index:70;width:10px;height:14px;top:-20px;pointer-events:none;border-radius:2px;}
 
-  /* ===== DESKTOP: branded backdrop + phone device frame ===== */
-  .desktop-hero{display:none;}
+  /* ===== DESKTOP: real desktop layout (left sidebar + wide content) ===== */
+  .main{display:contents;}
+  .side-brand{display:none;}
   @media (min-width:900px){
-    body{display:flex;align-items:center;justify-content:center;gap:60px;padding:40px;
-      background:radial-gradient(1100px 760px at 80% 28%,#2a1c5e66,transparent),radial-gradient(820px 640px at 18% 74%,#3a1d6e44,transparent),linear-gradient(135deg,#06081a,#0c0a26 58%,#06081a);}
-    #app{width:404px;height:min(872px,94vh);max-width:none;flex:none;border-radius:48px;
-      border:12px solid #0a0c20;box-shadow:0 0 0 2px #ffffff14,0 44px 100px #000c,inset 0 0 0 1px #ffffff12;overflow:hidden;}
-    .desktop-hero{display:flex;flex-direction:column;max-width:430px;}
-    .desktop-hero .logo{font-weight:700;font-size:58px;line-height:.95;letter-spacing:.01em;
-      background:linear-gradient(120deg,#00E5FF,#FFD54F 55%,#C084FC);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 26px #00e5ff44);}
-    .desktop-hero .tag{font-size:21px;font-weight:600;color:#e6ecff;margin-top:16px;line-height:1.3;}
-    .desktop-hero .sub{font-size:15px;color:#aab6e0;margin-top:8px;line-height:1.5;}
-    .desktop-hero ul{list-style:none;margin:22px 0 0;display:flex;flex-direction:column;gap:12px;}
-    .desktop-hero li{display:flex;align-items:center;gap:12px;font-size:15.5px;font-weight:500;color:#dfe7ff;}
-    .desktop-hero li .e{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-size:19px;background:#ffffff12;border:1.5px solid #ffffff1f;flex:none;}
-    .desktop-hero .note{margin-top:24px;font-size:13px;color:#8e9bce;border-left:3px solid #FFD54F;padding-left:12px;line-height:1.45;}
+    body{display:flex;align-items:center;justify-content:center;padding:30px;
+      background:radial-gradient(1100px 760px at 80% 26%,#2a1c5e55,transparent),radial-gradient(820px 640px at 16% 76%,#3a1d6e3d,transparent),linear-gradient(135deg,#06081a,#0c0a26 58%,#06081a);}
+    #app{flex-direction:row;width:min(1240px,97vw);height:min(900px,95vh);max-width:none;border-radius:26px;border:1px solid #ffffff1a;box-shadow:0 40px 100px #000b;overflow:hidden;}
+    .main{display:flex;flex-direction:column;flex:1;min-width:0;position:relative;overflow:hidden;}
+    .nav{order:-1;display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;width:230px;flex:none;padding:20px 14px;gap:4px;border-top:none;border-right:1.5px solid #ffffff14;background:rgba(8,10,28,.5);}
+    .side-brand{display:block;font-weight:700;font-size:25px;letter-spacing:.01em;padding:4px 10px 20px;background:linear-gradient(120deg,#00E5FF,#FFD54F 55%,#C084FC);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+    .nav button{flex-direction:row;justify-content:flex-start;gap:13px;font-size:15px;padding:12px 14px;border-radius:13px;width:100%;}
+    .nav button .ic{font-size:21px;}
+    .nav button.on{background:#ffffff14;color:#fff;}.nav button.on .ic{transform:none;}
+    .hud{padding:18px 24px 4px;}
+    .ttl{padding:18px 26px 2px;}.ttl h1{font-size:27px;}
+    .cards{grid-template-columns:repeat(3,1fr);padding:18px 26px;}
+    .cta-bar{position:static;background:none;padding:8px 26px 24px;max-width:600px;margin:0 auto;width:100%;}
+    .grid2{grid-template-columns:repeat(4,1fr);padding:18px 26px;}
+    #eventList{display:grid;grid-template-columns:1fr 1fr;padding:10px 14px;}
+    #bossList{display:grid;grid-template-columns:1fr 1fr;padding:12px 14px;}
+    .ebanner{margin:0 8px 12px;height:140px;}
+    .boss{margin:0 8px 12px;}
+    .map{display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:22px 30px;padding:26px;}
+    .planet{position:static!important;}
+    .planet .orb-w{width:104px;height:104px;}
+    .wname h1{font-size:34px;}.nodes{gap:14px;}
   }
-  @media (min-width:900px) and (max-width:1080px){ .desktop-hero{max-width:330px;} .desktop-hero .logo{font-size:44px;} }
 </style>
 </head>
 <body>
-<div class="desktop-hero">
-  <div class="logo">COINAVERSE</div>
-  <div class="tag">Where kids become money heroes.</div>
-  <div class="sub">A financial-literacy adventure by CoinCept — pick your money type, explore the galaxy, and master real money skills.</div>
-  <ul>
-    <li><span class="e">🎮</span> Choose your money archetype</li>
-    <li><span class="e">🪐</span> Explore 7 financial worlds</li>
-    <li><span class="e">⚔️</span> Beat the villains, ace the lessons</li>
-    <li><span class="e">📊</span> Parents track real progress</li>
-  </ul>
-  <div class="note">Optimized for mobile — play it on your phone for the full experience.</div>
-</div>
 <div id="app">
   <div class="stars" id="stars"></div>
+  <div class="main">
   <div class="hud" id="hud">
     <div class="hud-row">
       <div class="chip me" onclick="go('me')"><img id="meAv" alt=""><span id="meName">Hero</span></div>
@@ -258,8 +256,10 @@
       </div>
     </div>
   </div>
+  </div>
 
   <div class="nav" id="nav">
+    <div class="side-brand">COINAVERSE</div>
     <button data-p="map" onclick="go('map')"><span class="ic">🪐</span>Map</button>
     <button data-p="events" onclick="go('events')"><span class="ic">⚡</span>Events</button>
     <button data-p="boss" onclick="go('boss')"><span class="ic">⚔️</span>Boss</button>
